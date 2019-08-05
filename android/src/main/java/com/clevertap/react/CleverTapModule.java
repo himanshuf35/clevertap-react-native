@@ -107,7 +107,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
             }
             mCleverTap = clevertap;
         }
-        return mCleverTap
+        return mCleverTap;
     }
 
     // launch
