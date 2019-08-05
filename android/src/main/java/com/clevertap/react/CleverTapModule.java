@@ -97,6 +97,19 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         }
     }
 
+    private CleverTapAPI getCleverTapAPI() {
+        if (mCleverTap == null) {
+            CleverTapAPI clevertap = CleverTapAPI.getDefaultInstance(this.context);
+            if (clevertap != null) {
+                clevertap.setInAppNotificationListener(this);
+                clevertap.setSyncListener(this);
+                clevertap.setCTNotificationInboxListener(this);
+            }
+            mCleverTap = clevertap;
+        }
+        return mCleverTap
+    }
+
     // launch
 
     @ReactMethod
@@ -122,7 +135,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void setPushTokenAsString(String token, String type) {
-        CleverTapAPI clevertap = this.myClevertap;
+        CleverTapAPI clevertap = this.getCleverTapAPI();
         if (clevertap == null || token == null || type == null) return;
 
         if (FCM.equals(type)) {
