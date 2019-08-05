@@ -315,8 +315,8 @@ var CleverTap = {
     * In addition, any global frequency caps are reset as part of the switch.
     * @param {object} profile - key-value profile properties.  keys are strings and values can be string, number or boolean.
     */
-    onUserLogin: function(profile) {
-        CleverTapReact.onUserLogin(profile);
+    onUserLogin: function(profile, customId) {
+        CleverTapReact.onUserLogin(profile, customId);
     },
 
     /**

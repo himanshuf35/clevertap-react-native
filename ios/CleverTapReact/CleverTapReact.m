@@ -182,10 +182,13 @@ RCT_EXPORT_METHOD(profileGetCleverTapID:(RCTResponseSenderBlock)callback) {
     [self returnResult:result withCallback:callback andError:nil];
 }
 
-RCT_EXPORT_METHOD(onUserLogin:(NSDictionary*)profile) {
+RCT_EXPORT_METHOD(onUserLogin:(NSDictionary*)profile customId:(NSString*)customId) {
+    //Code below is for setting customId for clevertap
+    [CleverTap autoIntegrateWithCleverTapID:customId];
+    [CleverTap sharedInstanceWithCleverTapID:customId];
     RCTLogInfo(@"[CleverTap onUserLogin: %@]", profile);
     NSDictionary *_profile = [self formatProfile:profile];
-    [[CleverTap sharedInstance] onUserLogin:_profile];
+    [[CleverTap sharedInstance] onUserLogin:_profile withCleverTapID:customId];
 }
 
 RCT_EXPORT_METHOD(profileSet:(NSDictionary*)profile) {

@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
 import javax.annotation.Nullable;
+import java.lang.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +45,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     private CleverTapAPI mCleverTap;
     private static Uri mlaunchURI;
+    private CleverTapAPI myClevertap;
 
     private static final String REACT_MODULE_NAME = "CleverTapReact";
     private static final String TAG = REACT_MODULE_NAME;
@@ -80,21 +82,19 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
     public CleverTapModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.context = reactContext;
-        getCleverTapAPI();
     }
 
-    private CleverTapAPI getCleverTapAPI() {
+    private void setCleverTapAPI(String customId) {
         if (mCleverTap == null) {
-            CleverTapAPI clevertap = CleverTapAPI.getDefaultInstance(this.context);
+            CleverTapAPI clevertap = CleverTapAPI.getDefaultInstance(this.context, customId);
             if (clevertap != null) {
                 clevertap.setInAppNotificationListener(this);
                 clevertap.setSyncListener(this);
                 clevertap.setCTNotificationInboxListener(this);
             }
             mCleverTap = clevertap;
+            this.myClevertap  = mCleverTap;
         }
-
-        return mCleverTap;
     }
 
     // launch
@@ -122,7 +122,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void setPushTokenAsString(String token, String type) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null || token == null || type == null) return;
 
         if (FCM.equals(type)) {
@@ -138,7 +138,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void createNotificationChannel(String channelId, String channelName, String channelDescription, int importance, boolean showBadge){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null || channelId == null || channelName == null || channelDescription == null) return;
         CleverTapAPI.createNotificationChannel(this.context,channelId,channelName,channelDescription,importance,showBadge);
         Log.i(TAG, "Notification Channel "+ channelName +" created");
@@ -146,7 +146,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void createNotificationChannelWithSound(String channelId, String channelName, String channelDescription, int importance, boolean showBadge, String sound){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null || channelId == null || channelName == null || channelDescription == null || sound == null) return;
         CleverTapAPI.createNotificationChannel(this.context,channelId,channelName,channelDescription,importance,showBadge,sound);
         Log.i(TAG, "Notification Channel "+ channelName +" with sound file "+sound+" created");
@@ -154,7 +154,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void createNotificationChannelWithGroupId(String channelId, String channelName, String channelDescription, int importance, String groupId, boolean showBadge){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null || channelId == null || channelName == null || channelDescription == null || groupId == null) return;
         CleverTapAPI.createNotificationChannel(this.context,channelId,channelName,channelDescription,importance,groupId,showBadge);
         Log.i(TAG, "Notification Channel "+ channelName +" with Group Id "+ groupId + " created");
@@ -162,7 +162,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void createNotificationChannelWithGroupIdAndSound(String channelId, String channelName, String channelDescription, int importance, String groupId, boolean showBadge, String sound){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null || channelId == null || channelName == null || channelDescription == null || groupId == null || sound == null) return;
         CleverTapAPI.createNotificationChannel(this.context,channelId,channelName,channelDescription,importance,groupId,showBadge,sound);
         Log.i(TAG, "Notification Channel "+ channelName +" with Group Id "+ groupId + " and sound file "+sound+" created");
@@ -170,7 +170,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void createNotificationChannelGroup(String groupId, String groupName){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null || groupId == null || groupName == null) return;
         CleverTapAPI.createNotificationChannelGroup(this.context,groupId,groupName);
         Log.i(TAG, "Notification Channel Group "+ groupName +" created");
@@ -178,7 +178,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void deleteNotificationChannel(String channelId){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null || channelId == null) return;
         CleverTapAPI.deleteNotificationChannel(this.context,channelId);
         Log.i(TAG, "Notification Channel Id "+ channelId +" deleted");
@@ -186,7 +186,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void deleteNotificationChannelGroup(String groupId){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null || groupId == null) return;
         CleverTapAPI.deleteNotificationChannelGroup(this.context,groupId);
         Log.i(TAG, "Notification Channel Group Id "+ groupId +" deleted");
@@ -196,7 +196,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void setOptOut(boolean value){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         clevertap.setOptOut(value);
     }
@@ -204,7 +204,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
     //Sets the SDK to offline mode
     @ReactMethod
     public void setOffline(boolean value){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         clevertap.setOffline(value);
     }
@@ -213,7 +213,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void enableDeviceNetworkInfoReporting(boolean value){
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         clevertap.enableDeviceNetworkInfoReporting(value);
     }
@@ -222,14 +222,14 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void enablePersonalization() {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         clevertap.enablePersonalization();
     }
 
     @ReactMethod
     public void disablePersonalization() {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         clevertap.disablePersonalization();
     }
@@ -238,14 +238,14 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void recordScreenView(String screenName) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if(clevertap == null) return;
         clevertap.recordScreen(screenName);
     }
 
     @ReactMethod
     public void recordEvent(String eventName, ReadableMap props) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
 
         Map<String, Object> finalProps = eventPropsFromReadableMap(props);
@@ -259,7 +259,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void recordChargedEvent(ReadableMap details, ReadableArray items) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null || details == null) return;
 
         HashMap<String, Object> finalDetails = eventPropsFromReadableMap(details);
@@ -289,7 +289,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         int result = -1;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             result = clevertap.getFirstTime(eventName);
         } else {
@@ -303,7 +303,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         int result = -1;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             result = clevertap.getLastTime(eventName);
         } else {
@@ -317,7 +317,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         int result = -1;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             result = clevertap.getCount(eventName);
         } else {
@@ -331,7 +331,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         WritableMap result = null;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             EventDetail detail = clevertap.getDetails(eventName);
             result = eventDetailToWritableMap(detail);
@@ -346,7 +346,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         WritableMap result = null;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             Map<String, EventDetail> history = clevertap.getHistory();
             result = eventHistoryToWritableMap(history);
@@ -360,7 +360,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void setLocation(double latitude, double longitude) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         final Location location = new Location("CleverTapReact");
         location.setLatitude(latitude);
@@ -373,7 +373,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         String result = null;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             result = clevertap.getCleverTapAttributionIdentifier();
         } else {
@@ -387,7 +387,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         String result = null;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             result = clevertap.getCleverTapID();
         } else {
@@ -397,17 +397,19 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
     }
 
     @ReactMethod
-    public void onUserLogin(ReadableMap profile) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+    public void onUserLogin(ReadableMap profile, String customId) {
+        System.out.println(customId);
+        this.setCleverTapAPI(customId);
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
 
         Map<String, Object> finalProfile = profileFromReadableMap(profile);
-        clevertap.onUserLogin(finalProfile);
+        clevertap.onUserLogin(finalProfile, customId);
     }
 
     @ReactMethod
     public void profileSet(ReadableMap profile) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
 
         Map<String, Object> finalProfile = profileFromReadableMap(profile);
@@ -416,7 +418,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void profileSetGraphUser(ReadableMap profile) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
 
         try {
@@ -433,7 +435,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         Object result = null;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             Object value = clevertap.getProperty(propertyName);
             // Handle JSONArray for multi-values, otherwise everything should be primitive or String
@@ -459,14 +461,14 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void profileRemoveValueForKey(String key) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         clevertap.removeValueForKey(key);
     }
 
     @ReactMethod
     public void profileSetMultiValues(ReadableArray values, String key) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         ArrayList<String> finalValues = arrayListStringFromReadableArray(values);
         clevertap.setMultiValuesForKey(key, finalValues);
@@ -474,14 +476,14 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void profileAddMultiValue(String value, String key) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         clevertap.addMultiValueForKey(key, value);
     }
 
     @ReactMethod
     public void profileAddMultiValues(ReadableArray values, String key) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         ArrayList<String> finalValues = arrayListStringFromReadableArray(values);
         clevertap.addMultiValuesForKey(key, finalValues);
@@ -489,14 +491,14 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void profileRemoveMultiValue(String value, String key) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         clevertap.removeMultiValueForKey(key, value);
     }
 
     @ReactMethod
     public void profileRemoveMultiValues(ReadableArray values, String key) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         ArrayList<String> finalValues = arrayListStringFromReadableArray(values);
         clevertap.removeMultiValuesForKey(key, finalValues);
@@ -507,7 +509,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void pushInstallReferrer(String source, String medium, String campaign) {
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap == null) return;
         clevertap.pushInstallReferrer(source, medium, campaign);
     }
@@ -517,7 +519,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         int result = -1;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             result = clevertap.getTimeElapsed();
         } else {
@@ -531,7 +533,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         int result = -1;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             result = clevertap.getTotalVisits();
         } else {
@@ -545,7 +547,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         int result = -1;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             result = clevertap.getScreenCount();
         } else {
@@ -559,7 +561,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         int result = -1;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             result = clevertap.getPreviousVisitTime();
         } else {
@@ -573,7 +575,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         WritableMap result = null;
 
-        CleverTapAPI clevertap = getCleverTapAPI();
+        CleverTapAPI clevertap = this.myClevertap;
         if (clevertap != null) {
             UTMDetail details = clevertap.getUTMDetails();
             result = utmDetailsToWritableMap(details);
@@ -586,7 +588,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
     //App Inbox methods
     @ReactMethod
     public void initializeInbox(){
-        CleverTapAPI cleverTap = getCleverTapAPI();
+        CleverTapAPI cleverTap = this.myClevertap;
         if(cleverTap != null){
             cleverTap.initializeInbox();
             Log.e(TAG, "initializeInbox Called");
@@ -596,7 +598,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
     @ReactMethod
     public void showInbox(ReadableMap styleConfig){
         CTInboxStyleConfig inboxStyleConfig = styleConfigFromReadableMap(styleConfig);
-        CleverTapAPI cleverTap = getCleverTapAPI();
+        CleverTapAPI cleverTap = this.myClevertap;
         if(cleverTap != null){
             cleverTap.showAppInbox(inboxStyleConfig);
         }
@@ -608,7 +610,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         int result = -1;
 
-        CleverTapAPI cleverTap = getCleverTapAPI();
+        CleverTapAPI cleverTap = this.myClevertap;
         if (cleverTap != null) {
             result = cleverTap.getInboxMessageCount();
         } else {
@@ -623,7 +625,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         String error = null;
         int result = -1;
 
-        CleverTapAPI cleverTap = getCleverTapAPI();
+        CleverTapAPI cleverTap = this.myClevertap;
         if (cleverTap != null) {
             result = cleverTap.getInboxMessageUnreadCount();
         } else {
