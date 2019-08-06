@@ -85,16 +85,14 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
     }
 
     private void setCleverTapAPI(String customId) {
-        if (mCleverTap == null) {
-            CleverTapAPI clevertap = CleverTapAPI.getDefaultInstance(this.context, customId);
-            if (clevertap != null) {
-                clevertap.setInAppNotificationListener(this);
-                clevertap.setSyncListener(this);
-                clevertap.setCTNotificationInboxListener(this);
-            }
-            mCleverTap = clevertap;
-            this.myClevertap  = mCleverTap;
+        CleverTapAPI clevertap = CleverTapAPI.getDefaultInstance(this.context, customId);
+        if (clevertap != null) {
+            clevertap.setInAppNotificationListener(this);
+            clevertap.setSyncListener(this);
+            clevertap.setCTNotificationInboxListener(this);
         }
+        mCleverTap = clevertap;
+        this.myClevertap  = mCleverTap;
     }
 
     private CleverTapAPI getCleverTapAPI() {
