@@ -249,7 +249,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void recordScreenView(String screenName) {
-        CleverTapAPI clevertap = this.myClevertap;
+        CleverTapAPI clevertap = this.getCleverTapAPI();
         if(clevertap == null) return;
         clevertap.recordScreen(screenName);
     }
@@ -599,7 +599,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
     //App Inbox methods
     @ReactMethod
     public void initializeInbox(){
-        CleverTapAPI cleverTap = this.myClevertap;
+        CleverTapAPI cleverTap = this.getCleverTapAPI();
         if(cleverTap != null){
             cleverTap.initializeInbox();
             Log.e(TAG, "initializeInbox Called");
@@ -609,7 +609,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
     @ReactMethod
     public void showInbox(ReadableMap styleConfig){
         CTInboxStyleConfig inboxStyleConfig = styleConfigFromReadableMap(styleConfig);
-        CleverTapAPI cleverTap = this.myClevertap;
+        CleverTapAPI cleverTap = this.getCleverTapAPI();
         if(cleverTap != null){
             cleverTap.showAppInbox(inboxStyleConfig);
         }
