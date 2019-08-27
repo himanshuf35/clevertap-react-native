@@ -103,7 +103,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
             clevertap.setSyncListener(this);
             clevertap.setCTNotificationInboxListener(this);
         }
-        mCleverTap = clevertap;
+        this.mCleverTap = clevertap;
         return mCleverTap
     }
 
