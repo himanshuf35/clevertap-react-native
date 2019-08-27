@@ -96,7 +96,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
         return this.mCleverTap;
     }
 
-    private void getCleverTapAPI(String customId) {
+    private CleverTapAPI getCleverTapAPI(String customId) {
         CleverTapAPI clevertap = CleverTapAPI.getDefaultInstance(this.context, customId);
         if (clevertap != null) {
             clevertap.setInAppNotificationListener(this);
@@ -408,7 +408,7 @@ public class CleverTapModule extends ReactContextBaseJavaModule implements SyncL
 
     @ReactMethod
     public void onUserLogin(ReadableMap profile, String customId) {
-        CleverTapAPI clevertap = this.getCleverTapID(customId);
+        CleverTapAPI clevertap = this.getCleverTapAPI(customId);
         if (clevertap == null) return;
 
         Map<String, Object> finalProfile = profileFromReadableMap(profile);
